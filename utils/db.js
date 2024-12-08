@@ -1,5 +1,5 @@
 import mongoDBCore from "mongodb/lib/core";
-const { MongoClient } = require("mongodb");
+import { MongoClient } from 'mongodb';
 
 /**
  * MongoDB client class for managing database interactions.
