@@ -4,6 +4,7 @@ import { promises as fsPromises } from 'fs';
 import fileUtils from './utils/file';
 import userUtils from './utils/user';
 import basicUtils from './utils/basic';
+const dbClient = require('../utils/db');
 
 const imageThumbnail = require('image-thumbnail');
 
