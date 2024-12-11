@@ -1,19 +1,17 @@
-import mongoDBCore from "mongodb/lib/core";
+import mongoDBCore from 'mongodb/lib/core';
 import { MongoClient } from 'mongodb';
 
-/**
- * MongoDB client class for managing database interactions.
- * @class DBClient
- */
+/*  MongoDB client class for managing database interactions. @class DBClient */
+
 class DBClient {
   /**
    * Initializes the MongoDB client.
    * Sets the connection parameters and connects to the database.
    */
   constructor() {
-    const host = process.env.DB_HOST || "localhost";
+    const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || "files_manager";
+    const database = process.env.DB_DATABASE || 'files_manager';
     const uri = `mongodb://${host}:${port}/${database}`;
 
     this.client = new MongoClient(uri, {
@@ -45,7 +43,7 @@ class DBClient {
    * @returns {Promise<number>} The number of users.
    */
   async nbUsers() {
-    return this.client.db().collection("users").countDocuments();
+    return this.client.db().collection('users').countDocuments();
   }
 
   /**
@@ -53,7 +51,7 @@ class DBClient {
    * @returns {Promise<number>} The number of files.
    */
   async nbFiles() {
-    return this.client.db().collection("files").countDocuments();
+    return this.client.db().collection('files').countDocuments();
   }
 
   /**
@@ -61,7 +59,7 @@ class DBClient {
    * @returns {Promise<Collection>} The `users` collection.
    */
   async usersCollection() {
-    return this.client.db().collection("users");
+    return this.client.db().collection('users');
   }
 
   /**
@@ -91,7 +89,7 @@ class DBClient {
    * @returns {Promise<Collection>} The `files` collection.
    */
   async filesCollection() {
-    return this.client.db().collection("files");
+    return this.client.db().collection('files');
   }
 
   /**
