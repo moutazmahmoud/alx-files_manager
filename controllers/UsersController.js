@@ -2,28 +2,44 @@ import { ObjectId } from 'mongodb';
 import sha1 from 'sha1';
 import Queue from 'bull';
 import dbClient from '../utils/db';
-import userUtils from '../utils/user';
 
 const userQueue = new Queue('userQueue');
 
 class UsersController {
-  static async postNew(req, res) {
-    const { email, password } = req.body;
+  static async postNew(request, response) {
+    const { email, password } = request.body;
 
-    if (!email) return res.status(400).json({ error: 'Missing email' });
-    if (!password) return res.status(400).json({ error: 'Missing password' });
+    if (!email) return response.status(400).send({ error: 'Missing email' });
 
-    const usersCollection = dbClient.db.collection('users');
-    const userExists = await usersCollection.findOne({ email });
+    if (!password) { return response.status(400).send({ error: 'Missing password' }); }
 
-    if (userExists) return res.status(400).json({ error: 'Already exist' });
+    const emailExists = await dbClient.usersCollection.findOne({ email });
 
-    const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
-    const newUser = { email, password: hashedPassword };
+    if (emailExists) { return response.status(400).send({ error: 'Already exist' }); }
 
-    const result = await usersCollection.insertOne(newUser);
+    const sha1Password = sha1(password);
 
-    res.status(201).json({ id: result.insertedId, email });
+    let result;
+    try {
+      result = await dbClient.usersCollection.insertOne({
+        email,
+        password: sha1Password,
+      });
+    } catch (err) {
+      await userQueue.add({});
+      return response.status(500).send({ error: 'Error creating user.' });
+    }
+
+    const user = {
+      id: result.insertedId,
+      email,
+    };
+
+    await userQueue.add({
+      userId: result.insertedId.toString(),
+    });
+
+    return response.status(201).send(user);
   }
 
   static async getMe(req, res) {
@@ -33,7 +49,7 @@ class UsersController {
     const user = await dbClient.db.collection('users').findOne({ _id: new ObjectId(userId) });
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
-    res.status(200).json({ id: user._id, email: user.email });
+    return res.status(200).json({ id: user._id, email: user.email });
   }
 }
 
