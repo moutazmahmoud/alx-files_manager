@@ -1,8 +1,7 @@
-const { ObjectId } = require('mongodb');
-const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
-const dbClient = require('../utils/db');
-const redisClient = require('../utils/redis');
+import { v4 as uuidv4 } from 'uuid';
+import sha1 from 'sha1';
+import redisClient from '../utils/redis';
+import userUtils from '../utils/user';
 
 class AuthController {
   static async getConnect(req, res) {
@@ -42,4 +41,4 @@ class AuthController {
   }
 }
 
-module.exports = AuthController;
+export default AuthController;
